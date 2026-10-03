@@ -1,0 +1,103 @@
+環境・ソフトウェア構成および必要時期																
+本資料は、各工程で必要となるツール・ソフトウェアの一覧を、必要時期およびネットワーク接続要件とともに整理したものです。																
+TISI様には、①インストール可否、②購入可否、③接続制約の3点についてご確認いただきたく存じます。																
+																
+■ 接続経路																
+	①L*V*N*			②A*I*N								③P*N				
+	開発者PC		▶	中継端末						▶		作業端末				
+	"Windows 10/11
+VPN client"			"Windows 10/11
+VPN client"								"開発ツール一式
+（下表参照）"				
+																
+																
+			▼ P*N端末からの接続									▼ P*N端末からの接続				
+	④現行システム Solaris 10									⑤開発環境 RHEL 9.4						
+	シングルノード構成									Multi-AZ構成						
+	"JDK 1.4/InterStage/C compiler
+TWS/Oracle 10gR2"									"JBoss EAP 8.0/Apache/JDK 21
+Spring/PostgreSQL/JP1"						
+																
+	利用開始時期：2026年10月～									利用開始時期：2027年03月～						
+															◎	必須
+															○	必要
+															△	推奨
+■ 工程別必要ツール一覧															―	任意
+No	工程	作業内容（ステップ/グループ）	用途	ツール・ソフトウェア	"①L*V*N*
+端末"	"②A*I*N
+端末"	"③P*N
+端末"	④Solaris 10	⑤RHEL 9.4	ライセンス/費用	"必要時期
+（最遅）"	"ネットワーク接続
+【インストール時】"	"ネットワーク接続
+【利用時】"	確認ステータス	必要度	代替可否・代替手段
+1	0. 共通	リモート接続	L*V*N* → A*I*N → P*N の3段接続	VPN client	O	O				お客様よりご提供	10/1/2026	必要（接続の都度）	必要（常時）		◎	代替不可 — 接続経路そのもの
+2	0. 共通	リモート接続	A*I*N端末の画面操作	Remote desktop client	O	O				OS標準搭載	10/1/2026	不要	必要（常時）		◎	代替不可
+3	0. 共通	成果物作成	成果物の作成（Excel/Word/PowerPoint）	Microsoft Office			O			有償	10/1/2026	必要（アクティベーション時）	不要		◎	代替不可
+4	2. 調査	Shell/JOBの棚卸し	現状調査のためのSolaris 10へのSSH接続	TeraTerm / PuTTY			O			無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要（内部SSH）		○	Windows同梱のOpenSSHで代替 — 操作性は劣るが可能
+5	2. 調査	現行資産の取得	現行環境とのファイル授受	WinSCP			O			無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要（内部SFTP）		○	scp/sftpコマンドで代替 — 操作性は劣る
+6	2. 調査	資産・SQLの棚卸しおよびAI用ツール作成	資産棚卸し・SQL抽出・集計スクリプト；AI用ツールの作成	Python 3			O			無償（OSS）	10/1/2026	必要（ダウンロード＋pip）	不要		○	シェルスクリプトで代替 — 工数増かつ再利用性が低い
+7	2. 調査	非互換API調査（jdeprscan/jdeps）	jdeps：パッケージ/モジュール依存分析；jdeprscan：新JDKでの廃止/削除API検出	JDK 21 (OpenJDK)			O			無償	10/1/2026	必要（ダウンロード時のみ）	不要		◎	代替不可 — 移行先ランタイムかつ調査ツール
+8	2. 調査	SQL抽出・スキーマ調査	Oracle 10gR2への接続・SQL抽出	Oracle Instant Client			O			無償（利用規約への同意が必要）	10/1/2026	必要（ダウンロード＋規約同意）	不要（内部DB接続）		◎	TISI様にSQL・スキーマを出力いただく — 双方に追加工数が発生
+9	2. 調査	2つのDBへの接続および結果比較	Oracle・PostgreSQL双方への接続と結果比較	DBeaver / A5:SQL Mk-2			O			無償	10/1/2026	必要（ダウンロード＋JDBC）	不要		○	sqlplus・psqlを個別利用 — 結果の直接比較ができない
+10	2. 調査	ソースコード管理	ソースコードのバージョン管理	Git			O			無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要（内部リポジトリ）		○	SVNまたはフォルダ管理で代替 — 履歴追跡が困難
+11	2. 調査	資産取得（SVN管理の場合）	現行資産の取得（SVN管理の場合）	SVN client			O			無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要		―	現行資産がSVN管理の場合のみ必要 — 要確認
+12	2. 調査	目視でのdiff確認	AI変換後の差分を100%レビュー・現新比較の目視確認	WinMerge			O			無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要		○	IDEのdiff機能で代替 — 複数ファイル比較には不便
+13	3. GAP	Oracle→PostgreSQLの差異洗い出し	AW SCTの補完：SCTが漏らした部分のスキーマ/PL-SQL変換；変換工数の見積レポート	Ora2Pg			O			無償（OSS）	10/1/2026	必要（ダウンロード＋CPAN）	不要		○	AWS SCTのみ利用 — SCTが漏らした部分は手作業
+14	3. GAP	Ora2Pg実行環境	Ora2Pgの実行環境	Perl			O			無償（OSS）	10/1/2026	必要（ダウンロード＋CPAN）	不要		○	Ora2Pgが実行不可 — Ora2Pgの欄を参照
+15	4. To-Be	スキーマ変換ドラフト生成	アセスメント + スキーマDDL自動変換 + PL/SQL→PL/pgSQL；対応項目一覧+自動化率の算出	AWS SCT			O			無償	10/1/2026	必要（ダウンロード＋アップデート）	不要		△	Ora2Pgのみ利用 — アセスメント・自動化率算出が不足
+16	5-A. PoC	PoC-1 Java 1.4 → JDK 21	Java開発	IntelliJ IDEA 2024			O			"Community版＝無償
+Ultimate版＝有償"	10/1/2026	必要（ダウンロード＋アップデート）	不要		○	Eclipse/VS Codeで代替 — 生産性が低下
+17	5-A. PoC	PoC-1/全PoC共通	依存管理（JDK互換解決）+成果物ビルド	Maven 3.9			O			無償（OSS）	10/1/2026	必要（依存関係の継続的取得）	必要（ビルドのたび）		◎	Gradleへ切替。ただし社内リポジトリミラーは同様に必要
+18	5-A. PoC	ビルド（Mavenの代替）	依存管理+成果物ビルド（Mavenの代替）	Gradle 8			O			無償（OSS）	10/1/2026	必要（依存関係の継続的取得）	必要（ビルドのたび）		―	Mavenを利用。いずれか一方で足りる
+19	5-A. PoC	Shell/設定ファイルの編集	Shell・設定ファイルの編集	Visual Studio Code			O			無償	10/1/2026	必要（ダウンロード＋拡張機能）	不要		○	他のエディタで代替
+20	5-A. PoC	PoC-2 Oracle → PostgreSQL	PoC-2（Oracle→PG変換）の検証。Aurora提供前の代替	PostgreSQL (local)			O			無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要		◎	Aurora提供（2027/03）まで待つ — PoC-2の実施時期がずれる
+21	5-A. PoC	AIによるソース変換	Java 1.4→21の自動変換を支援（生成AIレーン）	AI (AWS Kiro Pro)			O			有償	10/1/2026	必要（ログイン）	必要（常時・API呼び出し）		◎	代替不可。利用できない場合、手作業へ切替え工数の再算定が必要
+22	5-A. PoC	ローカルでの動作確認	ローカル動作確認/移行先APサーバ	JBoss EAP 8.0			O			開発用途＝無償	10/1/2026	必要（ダウンロード＋登録）	不要		◎	代替不可 — 移行先APサーバ
+23	5-B. PoC	新環境の提供	移行先OS（マルチAZ）	RHEL 9.4 (Multi-AZ)					O	TISI様にてご手配	3/1/2027	―	不要（内部接続）		◎	代替不可 — 移行先環境
+24	5-B. PoC	PoC-4 クラレット → REST	PoC-4（クラレット→REST）のclient側検証	.NET 4.6.2					O	無償	3/1/2027	必要（ダウンロード時のみ）	不要		○	PoC-4のclient側が検証できない
+25	5-B. PoC	PoC-5 epoch → SOAP（Multi-AZ）	ローカル動作確認/移行先APサーバ	JBoss EAP 8.0					O	有償（本番用ライセンス）	3/1/2027	必要（ダウンロード＋登録）	不要		◎	代替不可 — 移行先APサーバ
+26	5-B. PoC	PoC-5/Webサーバ	リバースプロキシ+負荷分散+TLS；Blue-green切替時のトラフィック制御	Apache HTTP Server 2.4.57					O	無償（OSS）	3/1/2027	必要（ダウンロード時のみ）	不要		○	AWSのELBで代替 — 現行と構成が異なる
+27	5-B. PoC	PoC-6 TWS → JP1	移行先ジョブスケジューラ	JP1 / AJS3					O	有償	3/1/2027	必要（メディア/ダウンロード）	不要		◎	代替不可 — 移行先ジョブスケジューラ
+28	5-B. PoC	移行先DB	移行先DB（マルチAZ）	Aurora PostgreSQL 15					O	有償（AWS利用料）	3/1/2027	―	必要（AWS接続）		◎	代替不可 — 移行先DB
+29	5-B. PoC	移行先ランタイム・フレームワーク	移行先アプリケーションフレームワーク	JDK 21 / Spring 6 / Boot 3.3					O	無償	3/1/2027	必要（ダウンロード＋依存関係）	不要		◎	代替不可 — 移行先ランタイム
+30	5-B. PoC	エビデンス取得	テストエビデンスの取得	Snagit			O			有償	10/1/2026	必要（ダウンロード＋認証）	不要		△	Windows標準のキャプチャで代替 — 操作性は劣る
+31	6. 品質	静的解析（不具合パターン検出）	静的解析（不具合パターン検出）	SpotBugs			O			無償（OSS）	10/1/2026	必要（Maven経由）	不要		△	SonarQubeで代替 — 検出範囲がやや狭い
+32	6. 品質	単体テスト・カバレッジ測定	単体テスト・カバレッジ測定	JUnit 5 ＋ JaCoCo			O			無償（OSS）	10/1/2026	必要（Maven経由）	不要		○	C1カバレッジが測定不可 — ゲート判定基準を証明できない
+33	2. 調査	現行Javaのビルド・確認	現行Javaのビルド・確認	JDK 1.4				O		無償	10/1/2026	―	不要		―	現行環境に既存
+34	2. 調査	APサーバ構成調査	現行APサーバ構成の調査	InterStage Application Server				O		有償	10/1/2026	―	不要		―	現行環境に既存
+35	2. 調査	現行Pro*Cのビルド・確認	現行Pro*Cのビルド・確認	C compiler (Pro*C)				O		有償	10/1/2026	―	不要		―	現行環境に既存
+36	2. 調査	ジョブ定義調査	現行ジョブ定義の調査	TWS				O		有償	10/1/2026	―	不要		―	現行環境に既存
+37	2. 調査	スキーマ調査・SQL抽出	スキーマ調査・SQL抽出	Oracle 10gR2				O		有償	10/1/2026	―	不要		―	現行環境に既存
+38	2. 調査	規模測定（LOC・モジュール数）	コード行数（LOC）+モジュール数を測定 — 規模見積の根拠	cloc			O			無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要		△	自作スクリプトで計数 — 同等の数値が得られる
+39	2. 調査	資料不足時に通信路上の実電文を外部観察	資料不足時、通信路上の実メッセージ形式を外部観察	Wireshark / tcpdump			O	O		無償（OSS）	10/1/2026	必要（ダウンロード時のみ）	不要		△	資料不足時のみ使用。ベンダーのSDK仕様書を優先する
+40	2. 調査	jarの公開クラス・メソッド一覧の参照（epoch/HttpComm）	jarの公開クラス/メソッド一覧+引数+戻り値を参照しインターフェース把握	javap（JDK同梱）			O			JDKに同梱	10/1/2026	―	不要		○	JDKに同梱のため個別手配は不要
+41	2. 調査	.NET DLLの公開クラス・メソッド一覧の参照	DLLの公開クラス/メソッド一覧+引数を宣言レベルで参照（コードは見ない）	ildasm（.NET SDK同梱）			O			.NET SDKに同梱	10/1/2026	―	不要		○	.NET SDKに同梱。ベンダーのSDK仕様書を優先する
+42	2. 調査	現行OSインベントリ収集（パッケージ・SMF・cron・ロケール）	現行OSインベントリ（パッケージ、SMFサービス、cron、マウント、ロケール）を収集	Solaris調査コマンド（pkginfo/svcs/crontab/locale）				O		OS標準搭載	10/1/2026	―	不要		◎	OS標準搭載のため追加インストール不要
+43	2. 調査	TWSからjob/jobnet定義をエクスポート	TWSからjob/jobnet定義をエクスポート（スケジュール、依存、カレンダー、変数、スクリプト）	TWS composer / conman				O		既存環境	10/1/2026	―	不要		◎	TWS画面から手動出力 — 工数増かつ漏れのリスク
+44	3. GAP	InterStage固有依存の検出・重大度分類・工数見積を実施	ソース/バイナリをスキャンし、InterStage固有依存を検出、重大度分類+工数見積	Red Hat MTA（Windup/Konveyor）			O			無償	11/1/2026	必要（ダウンロード＋ルール更新）	不要		△	依存関係を手作業で調査 — 工数が大幅増かつ漏れのリスク
+45	4. To-Be	文字コード変換（Shift-JIS/EUC-JP→UTF-8）	日本語テキスト列の文字コード（Shift-JIS/EUC-JP→UTF-8）を安全に変換	iconv			O	O		OS標準搭載	11/1/2026	―	不要		○	OS標準搭載のため追加インストール不要
+46	5-A. PoC	Javaバージョンアップの自動リファクタ（約70%自動）	Javaバージョンアップの自動リファクタ（raw type→generics、旧API→新）；参考約70%自動	OpenRewrite			O			無償（OSS）	12/1/2026	必要（Maven経由・継続的）	必要（実行のたび）		△	AWS Kiroで代替。ただしOpenRewriteは約70%を決定的に自動化するため信頼性が異なる
+47	5-A. PoC	名前空間 javax.*→jakarta.* の自動変換	名前空間 javax.*→jakarta.*変更（WEB/APと同期）	Eclipse Transformer			O			無償（OSS）	12/1/2026	必要（Maven経由）	不要		○	手作業またはAIで名前空間を変更 — 工数増
+48	5-A. PoC	PostgreSQL埋込SQLプリコンパイラ（Pro*C代替）	PostgreSQLの埋込SQLプリコンパイラ、OracleのPro*Cを代替	ECPG（ecpg）			O		O	PostgreSQLに同梱	12/1/2026	必要（PostgreSQL同梱）	不要		◎	libpq/ODBCによる書換方式を選択 — 工数が大幅に増加
+49	5-A. PoC	件数・チェックサム・サンプルデータの照合	OracleとAuroraの件数+チェックサム+サンプルデータを照合	照合スクリプト（pgTAP/dblink）			O			無償（OSS）	12/1/2026	必要（拡張機能のダウンロード）	不要		○	素のSQLで自作 — 工数増
+50	5-A. PoC	epochのLogger機能を代替するログ基盤	epochのLogger機能を代替する標準ログフレームワーク（出力先、形式、ローテーション）	SLF4J ＋ Logback/Log4j2			O			無償（OSS）	12/1/2026	必要（Maven経由）	不要		○	java.util.loggingで代替 — 現行ログ形式の維持が困難
+51	5-A. PoC	REST契約の定義＋クライアント/サーバ雛形の生成	REST契約（スキーマ/バージョン管理）の定義+クライアント/サーバの雛形生成	OpenAPI / Swagger			O			無償（OSS）	12/1/2026	必要（ダウンロード＋生成）	不要		○	ドキュメントでAPI定義 — client/server間の齟齬リスク
+52	5-A. PoC	OpenAPIからRESTコードを生成	OpenAPIからREST クライアント/サーバコードを生成し実装工数削減	OpenAPI Generator			O			無償（OSS）	12/1/2026	必要（Maven経由・継続的）	不要		○	client/serverコードを手書き — 工数増
+53	5-A. PoC	APIテスト＋未整備システムの模擬	APIテスト+未整備の連携システムを模擬	Postman / SoapUI ＋ モック			O			Postman＝無償版あり	12/1/2026	必要（ダウンロード＋同期）	必要（クラウド同期時）		△	JUnitでテストを記述 — 初期の工数が増加
+54	6. 品質	型・ポインタ不具合の静的解析（C言語）	変換時の型/ポインタ不具合を静的解析で検出	cppcheck			O			無償（OSS）	2/1/2027	必要（ダウンロード時のみ）	不要		△	実施しない — 人によるレビューのみに依存
+55	5-B. PoC	データ移行（全ロード＋CDC継続同期）	データ移行（全ロード）+ CDC継続同期；Blue-green切替でダウンタイム削減	AWS DMS					O	有償（AWS利用料）	3/1/2027	―	必要（AWS接続）		△	自作の移行ツールで代替 — CDCが無く停止時間が長くなる
+56	5-B. PoC	パッケージ導入・標準設定の自動化（冪等）	パッケージ導入・標準設定・セキュリティ強化を自動化；冪等でMulti-AZノードを統一	Ansible					O	無償（OSS）	3/1/2027	必要（ダウンロード＋Galaxy）	不要		△	手作業で構築 — Multi-AZノード間の統一が困難
+57	5-B. PoC	PostgreSQLアクセスライブラリ（書換方式）	書換方式のPostgreSQLアクセスライブラリ（埋込SQLを使わない）	libpq / ODBC					O	無償（OSS）	3/1/2027	必要（ダウンロード時のみ）	不要		△	ECPGではなく書換方式を選択する場合のみ必要
+58	5-B. PoC	Cコードのコンパイル・リンク	Cコードのコンパイル+RHEL上でlibecpg/libpqとリンク	gcc 8.5.0 ＋ make					O	無償（OSS・RHEL同梱）	3/1/2027	―	不要		◎	RHEL同梱のため追加インストール不要
+59	5-B. PoC	ジョブネット定義の作成・投入・逆出力	ジョブネット定義の作成/インポート+JP1上のスケジュール/カレンダー/アラート設定	JP1/AJS3（ajsdefine・ajsprint）					O	JP1に同梱	3/1/2027	―	不要		◎	JP1に同梱のため個別手配は不要
+60	5-B. PoC	サーバ構築・設定・デプロイ	サーバ構築・設定（データソース、JTA、セキュリティ）、EAR/WARデプロイ	jboss-cli（JBoss EAP同梱）					O	JBoss EAPに同梱	3/1/2027	―	不要		◎	代替不可 — 移行先APサーバ
+61	5-B. PoC	JBoss上のRESTエンドポイント実装	JBoss上でRESTサーバエンドポイントを実装	JAX-RS / RESTEasy					O	JBoss EAPに同梱	3/1/2027	―	不要		○	JBoss EAPに同梱のため個別手配は不要
+62	5-B. PoC	負荷テスト・Multi-AZフェイルオーバー確認	負荷テスト、稼働率≥90%+Multi-AZフェイルオーバー挙動を確認	JMeter / Gatling					O	無償（OSS）	3/1/2027	必要（ダウンロード時のみ）	不要		△	自作スクリプトで測定 — 精度が下がる
+63	5-B. PoC	PostgreSQL性能の測定・分析	PostgreSQLの性能を測定・分析；インデックス/統計最適化の根拠	EXPLAIN ANALYZE / pgbench					O	PostgreSQLに同梱	3/1/2027	―	不要		△	PostgreSQLに同梱のため個別手配は不要
+64	5-B. PoC	CIS Benchmark に沿ったセキュリティ強化スキャン	CIS Benchmarkに沿ったセキュリティ強化のスキャン・確認	OpenSCAP / CIS-CAT					O	無償（OSS）	3/1/2027	必要（ダウンロード＋定義更新）	不要		△	チェックリストによる手動確認で代替
+65	5-B. PoC	サービス管理・ログ参照（SMF代替）	サービス管理・確認（SMF代替）；検証時のログ参照	systemd / systemctl / journalctl					O	RHEL標準搭載	3/1/2027	―	不要		△	RHEL標準搭載のため個別手配は不要
+66	5-B. PoC	サーバのOpenAPIから.NET用RESTクライアント生成	サーバのOpenAPIから.NET用RESTクライアントコードを生成	NSwag			O			無償（OSS）	3/1/2027	必要（ダウンロード＋生成）	不要		○	.NET用RESTクライアントを手書き
+67	5-B. PoC	REST APIを呼ぶライブラリ（httpcf.dll代替）	REST APIを呼ぶライブラリ（httpcf.dllの通信を代替）	.NET HttpClient			O			.NET標準搭載	3/1/2027	―	不要		○	.NET標準搭載のため個別手配は不要
+68	5-B. PoC	PC情報（PC種別・PC名）の収集（旧DLL代替）	PC情報（PC種別、PC名）を旧DLLの代わりに収集	WMI/.NET System.Management			O			.NET標準搭載	3/1/2027	―	不要		△	.NET標準搭載のため個別手配は不要
+69	5-B. PoC	ユーザ・部署・支店情報のサーバ取得	ユーザ/部署/支店情報をサーバから取得（サーバ側移行の場合）	Active Directory / LDAP					O	TISI様既存	3/1/2027	―	不要（内部AD）		○	支店情報をDBで管理 — 別途設計が必要
+70	5-B. PoC	新クライアントインストーラの数百台への配布	新クライアントインストーラを数百台へ段階配布	SCCM / Intune / GPO			O			TISI様既存	3/1/2027	―	―		△	TISI様既存。または手動配布 — 数百台では非現実的
